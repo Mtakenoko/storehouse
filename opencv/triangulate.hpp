@@ -2,7 +2,7 @@
 #define _HTL_TRIANGULATE_HPP__
 
 #include <opencv2/opencv.hpp>
-#include "vector.hpp"
+#include "../std/vector.hpp"
 
 #define TRI_ITERATIVE_TERM 0.001
 
