@@ -354,7 +354,6 @@ cv::Mat htl::Triangulate::triangulation_RANSAC(const std::vector<cv::Point_<T>> 
     {
         // std::cout << "point2D.size() = " << point2D.size() << std::endl;
         // std::cout << "So, I couldn't reconstruction" << std::endl;
-        std::cout << std::endl;
         cv::Mat ans;
         return ans;
     }
@@ -362,7 +361,6 @@ cv::Mat htl::Triangulate::triangulation_RANSAC(const std::vector<cv::Point_<T>> 
     // 除外したもので三角測量
     cv::Mat ans = htl::Triangulate::triangulation<T>(point2D, PrjMat);
     // std::cout << "ans point3D : " << ans << std::endl;
-    std::cout << std::endl;
     return ans;
 }
 
