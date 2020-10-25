@@ -1,7 +1,8 @@
-#ifndef _HTL_TRANSFORM_HPP_
-#define _HTL_TRANSFORM_HPP_
+#ifndef _HTL_TRANSFORM_HPP__
+#define _HTL_TRANSFORM_HPP__
 
 #include <opencv2/opencv.hpp>
+#include "pose.hpp"
 
 namespace htl
 {
@@ -25,10 +26,6 @@ namespace htl
         static cv::Vec<T, 3> QuaternionToRodrigues(T q0, T q1, T q2, T q3);
 
         template <class T>
-        static void EulerAnglesToQuaternion(T roll, T pitch, T yaw,
-                                            T &q0, T &q1, T &q2, T &q3);
-
-        template <class T>
         static void QuaternionToRotMat(T &m11, T &m12, T &m13,
                                        T &m21, T &m22, T &m23,
                                        T &m31, T &m32, T &m33,
@@ -37,6 +34,12 @@ namespace htl
         template <class T>
         static cv::Mat QuaternionToRotMat(const T &qx, const T &qy, const T &qz, const T &qw);
 
+        template <class T>
+        static cv::Mat QuaternionToRotMat(const htl::Quaternion<T> &quaternion);
+
+        template <class T>
+        static void EulerAnglesToQuaternion(T roll, T pitch, T yaw,
+                                            T &q0, T &q1, T &q2, T &q3);
         template <class T>
         static T RevFromRotMat(const cv::Mat &Rotation);
 
@@ -230,8 +233,7 @@ void htl::Transform::EulerAnglesToQuaternion(T roll, T pitch, T yaw,
 template <class T>
 void htl::Transform::QuaternionToRotMat(T &m11, T &m12, T &m13, T &m21, T &m22,
                                         T &m23, T &m31, T &m32, T &m33,
-                                        const T &qx, const T &qy, const T &qz,
-                                        const T &qw)
+                                        const T &qx, const T &qy, const T &qz, const T &qw)
 {
     m11 = 1.0f - 2.0 * qy * qy - 2.0 * qz * qz;
     m12 = 2.0 * qx * qy + 2.0 * qw * qz;
@@ -247,9 +249,28 @@ void htl::Transform::QuaternionToRotMat(T &m11, T &m12, T &m13, T &m21, T &m22,
 }
 
 template <class T>
-cv::Mat htl::Transform::QuaternionToRotMat(const T &qx, const T &qy, const T &qz,
-                                           const T &qw)
+cv::Mat htl::Transform::QuaternionToRotMat(const T &qx, const T &qy, const T &qz, const T &qw)
 {
+    cv::Mat Output = cv::Mat_<T>(3, 3);
+    Output.at<T>(0, 0) = qx * qx - qy * qy - qz * qz + qw * qw;
+    Output.at<T>(0, 1) = 2.0 * (qx * qy - qz * qw);
+    Output.at<T>(0, 2) = 2.0 * (qx * qz + qy * qw);
+    Output.at<T>(1, 0) = 2.0 * (qx * qy + qz * qw);
+    Output.at<T>(1, 1) = -qx * qx + qy * qy - qz * qz + qw * qw;
+    Output.at<T>(1, 2) = 2.0 * (qy * qz - qx * qw);
+    Output.at<T>(2, 0) = 2.0 * (qx * qz - qy * qw);
+    Output.at<T>(2, 1) = 2.0 * (qy * qz + qx * qw);
+    Output.at<T>(2, 2) = -qx * qx - qy * qy + qz * qz + qw * qw;
+    return Output;
+}
+
+template <class T>
+cv::Mat htl::Transform::QuaternionToRotMat(const htl::Quaternion<T> &quaternion)
+{
+    T qx = quaternion.x;
+    T qy = quaternion.y;
+    T qz = quaternion.z;
+    T qw = quaternion.w;
     cv::Mat Output = cv::Mat_<T>(3, 3);
     Output.at<T>(0, 0) = qx * qx - qy * qy - qz * qz + qw * qw;
     Output.at<T>(0, 1) = 2.0 * (qx * qy - qz * qw);
