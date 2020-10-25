@@ -1,5 +1,5 @@
-#ifndef HTL_PCL_MSG_CONVERTER__
-#define HTL_PCL_MSG_CONVERTER__
+#ifndef _HTL_PCL_MSG_CONVERTER__
+#define _HTL_PCL_MSG_CONVERTER__
 
 #include <opencv2/opencv.hpp>
 #include <sensor_msgs/msg/image.hpp>

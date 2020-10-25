@@ -1,5 +1,5 @@
-#ifndef HTL_MSG_CONVERTER__
-#define HTL_MSG_CONVERTER__
+#ifndef _HTL_MSG_CONVERTER__
+#define _HTL_MSG_CONVERTER__
 
 #include <opencv2/opencv.hpp>
 
@@ -14,12 +14,12 @@ namespace htl
     public:
         static void cvimage_to_msg(const cv::Mat &frame, size_t frame_id, sensor_msgs::msg::Image &msg);
         static void msg_to_cvimage(const sensor_msgs::msg::Image::SharedPtr &msg, cv::Mat &frame);
-        static std::string cvMattype_to_Encoding(int mat_type);
+        static std::string cvMattype_to_Encoding(const int &mat_type);
         static int Encoding_to_cvMattype(const std::string &encoding);
     };
 } // namespace htl
 
-std::string htl::Converter::cvMattype_to_Encoding(int mat_type)
+std::string htl::Converter::cvMattype_to_Encoding(const int &mat_type)
 {
     switch (mat_type)
     {
@@ -76,7 +76,7 @@ void htl::Converter::cvimage_to_msg(const cv::Mat &frame, size_t frame_id, senso
 {
     msg.height = frame.rows;
     msg.width = frame.cols;
-    msg.encoding = htl::Converter::cvMattype_to_Encoding(frame.type());
+    msg.encoding = cvMattype_to_Encoding(frame.type());
     msg.step = static_cast<sensor_msgs::msg::Image::_step_type>(frame.step);
     size_t size = frame.step * frame.rows;
     msg.data.resize(size);
@@ -86,11 +86,16 @@ void htl::Converter::cvimage_to_msg(const cv::Mat &frame, size_t frame_id, senso
 
 void htl::Converter::msg_to_cvimage(const sensor_msgs::msg::Image::SharedPtr &msg_image, cv::Mat &frame)
 {
-    cv::Mat frame_image(msg_image->height, msg_image->width, htl::Converter::Encoding_to_cvMattype(msg_image->encoding), const_cast<unsigned char *>(msg_image->data.data()), msg_image->step);
+    cv::Mat frame_image(msg_image->height, msg_image->width, Encoding_to_cvMattype(msg_image->encoding), const_cast<unsigned char *>(msg_image->data.data()), msg_image->step);
     if (msg_image->encoding == "rgb8")
     {
         cv::cvtColor(frame_image, frame_image, cv::COLOR_RGB2BGR);
     }
+    else if (msg_image->encoding == "mono8")
+    {
+        cv::cvtColor(frame_image, frame_image, cv::COLOR_GRAY2BGR);
+    }
+
     frame = frame_image.clone();
 }
 
